@@ -1,6 +1,16 @@
 # 🤖 AI Code Reviewer
 
+![Python](https://img.shields.io/badge/Python-3.x-blue) 
+![AI](https://img.shields.io/badge/AI-HuggingFace-orange)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agents-purple)
+![Agentic AI](https://img.shields.io/badge/Agentic_AI-Autonomous-red)
+
 An intelligent, multi-agent code review assistant powered by **LangGraph**, **Python AST**, and **Groq Cloud LLMs** (`llama-3.3-70b-versatile`).
+
+
+## 🎥 Demo
+
+![AI Code Reviewer Demo](assets/demo1.gif)
 
 ## ✨ Features
 
