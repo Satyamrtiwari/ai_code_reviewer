@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from graph.workflow import create_workflow
 
 st.set_page_config(page_title="AI Code Reviewer", page_icon="🤖", layout="wide")
@@ -63,7 +62,7 @@ if st.button("Review My Code", type="primary"):
                 ast_analysis = final_state.get("ast_analysis", {})
                 bugs = final_state.get("bugs", [])
                 quality = final_state.get("quality_review", {})
-                full_report = final_state.get("final_report", "")
+                rewritten_code = final_state.get("rewritten_code", "")
                 
                 st.success("All Done!")
                 
@@ -122,24 +121,18 @@ if st.button("Review My Code", type="primary"):
                         for i, suggestion in enumerate(suggestions[:5], 1): # Top 5 only
                             st.markdown(f"**{i}.** {suggestion}")
 
-                # 4. Complexity Analysis
-                with st.expander("⚙️ Complexity Analysis", expanded=True):
-                    complexity = quality.get("complexity", [])
-                    if not complexity:
-                        st.write("No complexity metrics available.")
+                # 4. Rewrite Full Code Correctly
+                with st.expander("✨ Rewrite Full Code Correctly", expanded=True):
+                    if not rewritten_code or rewritten_code.startswith("# Error"):
+                        st.warning("Could not rewrite the code. Check the error above.")
                     else:
-                        df = pd.DataFrame(complexity)
-                        # Reorder columns and capitalize
-                        if not df.empty and 'name' in df.columns and 'type' in df.columns and 'complexity' in df.columns:
-                            df = df[['name', 'type', 'complexity']]
-                            df.columns = ['Element Name', 'Type', 'Cyclomatic Complexity']
-                            st.table(df)
-                        else:
-                            st.write(complexity)
-                            
-                st.divider()
-                st.subheader("Raw Markdown Report")
-                st.code(full_report, language="markdown")
+                        st.code(rewritten_code, language=language.lower() if language != "C++" else "cpp")
+                        st.download_button(
+                            label="⬇️ Download Rewritten Code",
+                            data=rewritten_code,
+                            file_name=f"rewritten_code.{language.lower()}",
+                            mime="text/plain"
+                        )
                 
             except Exception as e:
                 st.error(f"An error occurred during review: {str(e)}")

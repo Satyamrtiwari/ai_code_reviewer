@@ -11,7 +11,7 @@ def get_groq_llm():
     api_key = os.getenv("GROQ_API_KEY")
     
     if not api_key:
-        raise ValueError("GROQ_API_KEY not found in .env file")
+        raise ValueError("GROQ_API_KEY not found. Please add it to your .env file or Streamlit Secrets.")
         
     return ChatGroq(
         groq_api_key=api_key,
