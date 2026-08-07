@@ -47,14 +47,30 @@ An intelligent, multi-agent code review assistant powered by **LangGraph**, **Py
 
 4. **Run the app**:
    ```bash
+   python run.py
+   # OR
    streamlit run app.py
    ```
+
+## 💓 Health Check & Uptime Monitoring
+
+This application includes custom route patching for **Uptime Robot** and other ping services:
+
+- **Primary Health Check URL**: `http://<your-host>:<port>/health` (Returns HTTP `200 OK` with body `ok`)
+- **Alternative Health Check URLs**: `http://<your-host>:<port>/healthz` or `http://<your-host>:<port>/_stcore/health`
+
+### Setting up Uptime Robot:
+1. Log in to [Uptime Robot](https://uptimerobot.com/).
+2. Click **Add New Monitor**.
+3. Select **HTTP(s)** as Monitor Type.
+4. Set URL to `https://<your-deployed-app-domain>/health` (e.g. `https://ai-code-reviewer.streamlit.app/health` or custom domain).
+5. Set Monitoring Interval to 5 minutes.
 
 ## ☁️ Streamlit Cloud Deployment
 
 1. Push this project to **GitHub**.
 2. Go to [share.streamlit.io](https://share.streamlit.io/) and connect your repo.
-3. Set `app.py` as the main file.
+3. Set `app.py` (or `run.py`) as the main file.
 4. In **Settings → Secrets**, add:
    ```toml
    GROQ_API_KEY = "your_groq_api_key_here"
@@ -64,7 +80,8 @@ An intelligent, multi-agent code review assistant powered by **LangGraph**, **Py
 
 ```
 ai_reviewer/
-├── app.py                    # Streamlit frontend
+├── app.py                    # Streamlit frontend with Tornado health patch
+├── run.py                    # Production entrypoint with pre-configured /health route
 ├── agents/
 │   ├── ast_analyzer.py       # Agent 1 — Static code analysis (Python only)
 │   ├── bug_detector.py       # Agent 2 — Bug & security detection via LLM
@@ -90,3 +107,4 @@ streamlit
 radon
 python-dotenv
 ```
+

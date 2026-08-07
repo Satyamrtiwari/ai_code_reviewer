@@ -1,4 +1,31 @@
 import streamlit as st
+
+# Ensure /health route is registered on Streamlit's Tornado server for monitoring (e.g., Uptime Robot)
+try:
+    import streamlit.web.server.server as _server
+    _server.HEALTH_ENDPOINT = r"(?:health|healthz|_stcore/health)"
+
+    import gc
+    import tornado.web
+    from streamlit.web.server.routes import HealthHandler
+
+    for _obj in gc.get_objects():
+        if isinstance(_obj, tornado.web.Application):
+            _rules = _obj.wildcard_router.rules
+            _has_health = any(
+                getattr(_r.matcher, 'regex', None) and _r.matcher.regex.pattern in (r'^/health$', r'^/healthz$')
+                for _r in _rules
+            )
+            if not _has_health:
+                _delegate = _obj.get_handler_delegate(
+                    HealthHandler,
+                    target_kwargs={'callback': lambda: True}
+                )
+                _rule = tornado.web.Rule(tornado.web.PathMatches(r'^/health$'), _delegate)
+                _rules.insert(0, _rule)
+except Exception:
+    pass
+
 from graph.workflow import create_workflow
 
 st.set_page_config(page_title="AI Code Reviewer", page_icon="🤖", layout="wide")
@@ -136,4 +163,14 @@ if st.button("Review My Code", type="primary"):
                 
             except Exception as e:
                 st.error(f"An error occurred during review: {str(e)}")
+
+if __name__ == "__main__":
+    import sys
+    from streamlit.runtime import exists
+    if not exists():
+        from streamlit.web.cli import main
+        sys.argv = ["streamlit", "run", __file__] + sys.argv[1:]
+        main()
+
+
 
